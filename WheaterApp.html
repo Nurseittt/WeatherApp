@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+        }
+        .main-card { 
+            margin-top: 20px; 
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background: #e0dbdb;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .btn {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #ff8f3f;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #d76f25;
+        }
+        .input {
+            padding: 10px 15px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: text;
+            transition: background-color 0.3s;
+        }
+        .card {
+            background: white;
+            width: 30%;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 25px;
+            transition: transform 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-card" id="weather-container">
+        <h1>Weather App</h1>
+        <input type="text" class="input" id="city-input" placeholder="Қала атын жазыңыз">
+        <button class="btn" id="search">Қаланы іздеу</button>
+        <button class="btn" id="myCity">Менің қалам</button>
+        <button class="btn" id="kzCities">Қазақстан қалалары</button>
+        
+        <div class="card" id="weather-card"></div>
+    </div>
+
+    <script>
+        
+        const weatherCard = document.getElementById("weather-card");
+//общая функция
+        async function fetchWeather(city) {
+            const apiKey = "e3ad77404dc88bee59f4a50942c3dbc6"; 
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=kk`;
+            
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                
+                if (data.cod !== 200) { 
+                    throw new Error(`Қате: ${data.message}`);
+                }
+                displayWeather(data);
+            } catch (error) {
+                console.error("Қате:", error);
+                alert("Ауа райын табу мүмкін емес!");
+            }
+        }
+        
+
+//display шаблон
+        function displayWeather(data) {
+            // weatherCard.innerHTML = ''
+            let div = document.createElement("div");
+
+            div.innerHTML = `<h2>${data.name}</h2>
+                                     <p>Температура: ${data.main.temp}°C</p>
+                                     <p>Ауа райы: ${data.weather[0].description}</p>`
+            weatherCard.appendChild(div)
+                                     
+        }
+
+//искать
+        document.getElementById("search").addEventListener("click", () => {
+            weatherCard.innerHTML = ''
+            const city = document.getElementById("city-input").value;
+            if (city) {
+                fetchWeather(city);
+            } else {
+                alert("Қала атын енгізіңіз!");
+            }
+        });
+//мой город
+        document.getElementById("myCity").addEventListener("click", () => {
+            weatherCard.innerHTML= ''
+            fetchWeather("Almaty"); 
+        });
+
+//все города кз
+document.getElementById("kzCities").addEventListener("click", async () => {
+    const cities = ["Almaty", "Astana", "Shymkent"];
+    weatherCard.innerHTML = ''
+
+    for (const city of cities) {        
+        fetchWeather(city);
+    }
+});
+
+//автоматом
+        fetchWeather("Almaty");
+    </script>
+
+</body>
+</html>
